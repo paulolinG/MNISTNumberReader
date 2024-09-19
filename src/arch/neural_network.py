@@ -33,7 +33,7 @@ class NeuralNetwork:
                 layer.computeActivationValues(self.neuralNetwork[i-1].activationValues)
 
     """
-    Computes the cost of the output with mse
+    Computes the cost of the output
         labels is the expected output of the corresponding inputs
     """
 
@@ -46,8 +46,8 @@ class NeuralNetwork:
 
     
     """
-    Performs backpropagation on the array, calculating the error contributions of all the nodes in the nn
-        inputs: backProp(self, labels)
+    Performs backpropagation on the array, calculating the error contributions of all the nodes in the neural network
+        labels is the target values to use for backpropagation
     """
 
     def backProp(self, labels):
@@ -64,12 +64,24 @@ class NeuralNetwork:
             layer.computeErrorVector(layerAfter.weightMatrix, layerAfter.errorVector)
 
 
+    """
+    Computes dC / dW for each weight in the neural network
+        inputs is the inputs used to compute dC / dW for the weights in the first layer
+    """
+
+
     def computeWeightErrors(self, inputs):
         # calculate the cost derivatives with resepct to the weights
         for i in range(len(self.neuralNetwork)):
             layer = self.neuralNetwork[i]
             activationValues = inputs if i == 0 else self.neuralNetwork[i-1].activationValues
             layer.computeCostWeightDerivative(activationValues)
+
+
+    """
+    Updates the weight and biases based on their error contributions
+        learningRate is the learning rate used to update the weights and biases
+    """
 
 
     def update_weights_and_biases(self, learningRate):
