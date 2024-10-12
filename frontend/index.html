@@ -17,10 +17,18 @@
         </div>
         <div class="nn-parameters">
             <i class="fa-solid fa-pen-to-square" id="config-icon"></i>
-            <div class="learning-rate-container">
-                <input type="number" step="0.001" min="0.01" class="learning-rate">
+            <div class="input-container">
+                <label for="learning-rate" class="learning-rate-label">
+                    Learning Rate (Multiplied by 1000):
+                </label>
+                <input type="number" step="0.001" min="0.01" id="learning-rate">
             </div>
-            <input type="number" min="1" step="1" class="number-of-layers">
+            <div class="input-container">
+                <label for="number-of-layers" class="learning-rate-label">
+                    Number of Layers:
+                </label>
+                <input type="number" min="1" step="1" id="number-of-layers">
+            </div>
         </div>
         <div class="nerual-network"></div>
     </div>
