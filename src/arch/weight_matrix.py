@@ -14,9 +14,17 @@ class WeightMatrix:
         self.sizeOut = numNeurons
         self.weights = self.he_normal_init()
 
+
     def he_normal_init(self):
         stddev = np.sqrt(2.0 / self.sizeIn)
         return np.random.normal(0, stddev, (self.sizeOut, self.sizeIn))
-    
+
+
     def basicTest(self):
         return np.ones((self.sizeOut, self.sizeIn))
+    
+
+    def serialize(self):
+        return {
+            "weights": self.weights.tolist()
+        }

@@ -15,9 +15,13 @@ class NeuralNetwork:
         self.neuralNetwork = np.empty(len(NNConfig), dtype=object)
         for i in range(len(NNConfig)):
             if i == 0:
-                self.neuralNetwork[i] = NeuronLayer(inputSize, NNConfig[0], activation=activations[0])
+                self.neuralNetwork[i] = NeuronLayer(inputSize, NNConfig[0], activations[0], "Input")
+            elif i == len(NNConfig) - 1:
+                self.neuralNetwork[i] = NeuronLayer(NNConfig[i-1], NNConfig[i], activations[i], "Output")
             else:
-                self.neuralNetwork[i] = NeuronLayer(NNConfig[i-1], NNConfig[i], activation=activations[i])
+                self.neuralNetwork[i] = NeuronLayer(NNConfig[i-1], NNConfig[i], activations[i], "Dense")
+        self.is_training = False
+        self.current_labels = None
 
     """
     Forward propagation to compute the activation values
@@ -52,8 +56,6 @@ class NeuralNetwork:
 
     def backProp(self, labels):
         # compute the errors of the last layer
-        batches = labels.shape[1]
-        numClasses = labels.shape[0]
         lastLayer = self.neuralNetwork[-1]
         lastLayer.computeErrorVectorLastLayer(labels)
 
@@ -89,5 +91,47 @@ class NeuralNetwork:
             layer.weightMatrix.weights = layer.weightMatrix.weights - (learningRate * layer.weightCosts)
             bias_grad = np.sum(layer.errorVector, axis = 1, keepdims=True)
             layer.biases = layer.biases - (learningRate * bias_grad)
+
+
+    def get_architecture(self):
+        architecture = {
+            "layers": []
+        }
+        for index, layer in enumerate(self.neuralNetwork):
+            layer_info = {
+                "layer_number": index + 1,
+                **layer.serialize()
+            }
+            architecture["layers"].append(layer_info)
+        return architecture
     
-            
+    
+    def train(self, input_data, labels, learning_rate = 0.01):
+        self.is_training = True
+        self.current_labels = labels
+        self.forwardPass(input_data)
+        self.computeCost(labels)
+        self.backProp(labels)
+        self.computeWeightErrors(input_data)
+        self.update_weights_and_biases(learning_rate)
+        self.is_training = False
+
+
+    def get_status(self):
+        if self.is_training:
+            status = {
+                "message": "Training in progress...",
+                "cost": None
+            }
+        else:
+            cost = self.computeCost(self.current_labels) if self.current_labels is not None else None
+            status = {
+                "message": "Model is ready.",
+                "cost": cost
+            }
+        return status
+    
+    
+    def predict(self, input_data):
+        self.forwardPass(tests = input_data)
+        return self.neuralNetwork[-1].activationValues
