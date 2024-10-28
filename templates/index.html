@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Number Recognizer Visualzation </title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="app.js" type="module"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/app.js" type="module"></script>
     <script src="https://kit.fontawesome.com/3c0253c3b4.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/cytoscape@3.20.0/dist/cytoscape.min.js"></script>
 </head>
@@ -44,8 +44,13 @@
             <div class="controls">
                 <button id="clear-btn">Clear</button>
                 <button id="submit-btn">Submit</button>
+                <button id="train-model"> Train-Model</button>
             </div>
         </div> 
+        <div class="neural-network-container">
+            <header> Neural Network Visualzation </header>
+            <div id="neural-network-vis"></div>
+        </div>
         <div class="nerual-network"></div>
     </div>
 </body>

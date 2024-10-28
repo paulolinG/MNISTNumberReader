@@ -6,8 +6,8 @@ class WeightMatrix:
     """
 
     """
-        numNueronsPrev is the number of neurons in the previous layer
-        numNeuronsCurr is the number of nuerons in this layer
+        numneuronsPrev is the number of neurons in the previous layer
+        numNeuronsCurr is the number of neurons in this layer
     """
     def __init__(self, numNeuronsPrev, numNeurons):
         self.sizeIn = numNeuronsPrev

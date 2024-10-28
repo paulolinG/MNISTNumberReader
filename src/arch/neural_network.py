@@ -104,18 +104,6 @@ class NeuralNetwork:
             }
             architecture["layers"].append(layer_info)
         return architecture
-    
-    
-    def train(self, input_data, labels, learning_rate = 0.01):
-        self.is_training = True
-        self.current_labels = labels
-        self.forwardPass(input_data)
-        self.computeCost(labels)
-        self.backProp(labels)
-        self.computeWeightErrors(input_data)
-        self.update_weights_and_biases(learning_rate)
-        self.is_training = False
-
 
     def get_status(self):
         if self.is_training:

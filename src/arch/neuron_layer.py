@@ -14,7 +14,7 @@ class NeuronLayer:
         biases is a vector of the biases used for this layer
     """
 
-    def __init__(self, neuronsPrev, neurons, activation, type='Demse'):
+    def __init__(self, neuronsPrev, neurons, activation, type='Dense'):
         self.biases = np.zeros(shape=(neurons,1))
         self.weightMatrix = WeightMatrix(neuronsPrev, neurons)
         self.errorVector = None
@@ -76,7 +76,7 @@ class NeuronLayer:
     def serialize(self):
         return {
             "layer_type": self.layer_type,
-            "num_nuerons": self.num_neurons,
+            "num_neurons": self.num_neurons,
             "activation": self.activation,
             **self.weightMatrix.serialize()
         }

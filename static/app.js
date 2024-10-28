@@ -1,23 +1,13 @@
 import { initializeInputBoxes } from "./inputs.js";
 import { initializeDrawGridButtons } from "./button_logic.js";
-
-// Removes the contents of the given DOM element (equivalent to elem.innerHTML = '' but faster)
-function emptyDOM(elem) {
-    while (elem.firstChild) elem.removeChild(elem.firstChild);
-}
-
-// Creates a DOM element from the given HTML string
-function createDOM(htmlString) {
-    let template = document.createElement("template");
-    template.innerHTML = htmlString.trim();
-    return template.content.firstChild;
-}
+import { fetchArchitecture } from "./cytoscape.js";
 
 /*
  *  saves the neural network parameters to local storage
  *  "learning_rate" is the key for the learningRate
  *  "number_of_layers" is the key for the layer count
  */
+
 function saveParameters() {
     const learningRate = document.querySelector("#learning-rate").value;
     localStorage.setItem("learning_rate", learningRate);
@@ -26,21 +16,6 @@ function saveParameters() {
     localStorage.setItem("number_of_layers", numberOfLayers);
 }
 
-function main() {
-    initializeInputBoxes();
-    document
-        .querySelector("#save-parameters")
-        .addEventListener("click", saveParameters);
-
-    const drawingGrid = document.getElementById("drawing-grid");
-    const clearButton = document.getElementById("clear-btn");
-    const submitButton = document.getElementById("submit-btn");
-
-    initializeDrawBox(drawingGrid);
-    initializeDrawGridButtons(clearButton, submitButton);
-}
-
-document.addEventListener("DOMContentLoaded", main);
 function initializeDrawBox(drawingGrid) {
     const gridSize = 28 * 28;
 
@@ -97,3 +72,21 @@ function initializeDrawBox(drawingGrid) {
     createGrid();
     addEventListeners();
 }
+
+async function main() {
+    initializeInputBoxes();
+    document
+        .querySelector("#save-parameters")
+        .addEventListener("click", saveParameters);
+
+    const drawingGrid = document.getElementById("drawing-grid");
+    const clearButton = document.getElementById("clear-btn");
+    const submitButton = document.getElementById("submit-btn");
+
+    initializeDrawBox(drawingGrid);
+    initializeDrawGridButtons(clearButton, submitButton);
+
+    await fetchArchitecture();
+}
+
+document.addEventListener("DOMContentLoaded", main);
