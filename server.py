@@ -10,8 +10,8 @@ import tensorflow_datasets as tfds
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
-layer_config = [2, 2, 1]  
-input_size = 728  
+layer_config = [2, 2, 10]  
+input_size = 784  
 activations = ["relu", "relu", "softmax"]
 learning_rate = 0.01
 neural_net = NeuralNetwork(layer_config, input_size, activations)
@@ -30,8 +30,9 @@ def set_parameters():
     if ('learning_rate' not in data) or ('layer_config' not in data):
         return jsonify({'error': 'No input data provided'}), 400
     try:
-        learning_rate = data['learning_rate']
-        layer_config = data['layer_config'] / 1000
+        learning_rate = int(data['learning_rate']) / 1000
+        layer_config = [int(data['layer_config'][0]) for i in range(len(data['layer_config']))]
+        layer_config.append(10)
         del neural_net
         gc.collect()
 
@@ -45,7 +46,6 @@ def set_parameters():
 
 
 @app.route('/api/architecture', methods=['GET'])
-@cache.cached(timeout=60)  # Cache for 60 seconds
 def get_architecture():
     architecture = neural_net.get_architecture()
     return jsonify(architecture)
@@ -61,25 +61,19 @@ def predict():
         predictions = neural_net.predict(input_data)
         return jsonify({'predictions': predictions.tolist()})
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/train', methods=['POST'])
 def train():
-    data = request.json
-    if 'input' not in data or 'labels' not in data:
-        return jsonify({'error': 'Insufficient training data.'}), 400
     try:
-        input_data = np.array(data['input']).reshape(-1, 1)  # Reshape as column vector
-        labels = np.array(data['labels']).reshape(-1, 1)    # Reshape as column vector
         neural_net.is_training = True
         
         ds = tfds.load('mnist', split='train', shuffle_files=True)
-        learningRate = 0.01
         epochs = 10
 
         ds = ds.shuffle(1024).batch(32).prefetch(tf.data.AUTOTUNE)
-        network = NeuralNetwork(NNConfig=[16, 16, 10], inputSize=784, activations=['relu', 'relu', 'softmax'])
 
         # Training loop:
         for epoch in range(epochs):
@@ -93,17 +87,17 @@ def train():
                 images = images / 255.0
                 labels_one_hot = np.eye(10)[labels].T
 
-                network.forwardPass(inputs=images)
+                neural_net.forwardPass(inputs=images)
 
-                loss = network.computeCost(labels=labels_one_hot)
+                loss = neural_net.computeCost(labels=labels_one_hot)
                 epoch_loss += loss
                 num_batches += 1
 
-                network.backProp(labels=labels_one_hot)
+                neural_net.backProp(labels=labels_one_hot)
 
-                network.computeWeightErrors(inputs=images)
+                neural_net.computeWeightErrors(inputs=images)
 
-                network.update_weights_and_biases(learningRate=learningRate)
+                neural_net.update_weights_and_biases(learning_rate)
                 
             test_ds = tfds.load('mnist', split='test', shuffle_files=False)
             test_batch_size = 1000 
@@ -118,9 +112,9 @@ def train():
                 test_images = test_images.reshape(test_images.shape[0], -1).T  
                 test_images = test_images / 255.0  
 
-                network.forwardPass(inputs=test_images)
+                neural_net.forwardPass(inputs=test_images)
 
-                predictions = network.neuralNetwork[-1].activationValues
+                predictions = neural_net.neuralNetwork[-1].activationValues
 
                 all_predictions.append(predictions)
                 all_labels.append(test_labels)
@@ -128,9 +122,9 @@ def train():
             all_predictions = np.concatenate(all_predictions, axis=1)
             all_labels = np.concatenate(all_labels, axis=0)
 
-            cost = neural_net.computeCost(labels)
-        return jsonify({'status': 'Training step completed', 'cost': cost})
+        return jsonify({'status': 'Training step completed'})
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
     
 

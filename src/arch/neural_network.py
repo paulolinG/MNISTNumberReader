@@ -121,5 +121,5 @@ class NeuralNetwork:
     
     
     def predict(self, input_data):
-        self.forwardPass(tests = input_data)
+        self.forwardPass(input_data)
         return self.neuralNetwork[-1].activationValues

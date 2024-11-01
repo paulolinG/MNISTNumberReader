@@ -1,5 +1,5 @@
 import { initializeInputBoxes } from "./inputs.js";
-import { initializeDrawGridButtons } from "./button_logic.js";
+import { initializeDrawGridButtons, trainModel } from "./button_logic.js";
 import { fetchArchitecture } from "./cytoscape.js";
 
 /*
@@ -8,12 +8,40 @@ import { fetchArchitecture } from "./cytoscape.js";
  *  "number_of_layers" is the key for the layer count
  */
 
-function saveParameters() {
+async function saveParameters() {
     const learningRate = document.querySelector("#learning-rate").value;
-    localStorage.setItem("learning_rate", learningRate);
-
     const numberOfLayers = document.querySelector("#number-of-layers").value;
-    localStorage.setItem("number_of_layers", numberOfLayers);
+    const nodesPerLayer = document.querySelector("#nodes-per-layer").value;
+    const layerConfig = [];
+
+    if (!numberOfLayers) {
+        return;
+    }
+
+    for (let i = 0; i < numberOfLayers; i++) {
+        layerConfig.push(nodesPerLayer);
+    }
+
+    try {
+        const response = await fetch(`/api/set_parameters`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                learning_rate: learningRate,
+                layer_config: layerConfig,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error("Could not change network parameters");
+        }
+
+        await fetchArchitecture();
+    } catch (error) {
+        throw error;
+    }
 }
 
 function initializeDrawBox(drawingGrid) {
@@ -82,9 +110,12 @@ async function main() {
     const drawingGrid = document.getElementById("drawing-grid");
     const clearButton = document.getElementById("clear-btn");
     const submitButton = document.getElementById("submit-btn");
+    const trainButton = document.getElementById("train-model");
 
     initializeDrawBox(drawingGrid);
     initializeDrawGridButtons(clearButton, submitButton);
+
+    trainButton.addEventListener("click", trainModel);
 
     await fetchArchitecture();
 }

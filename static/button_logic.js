@@ -26,16 +26,25 @@ function initializeDrawGridButtons(clearButton, submitButton) {
             const data = await response.json();
 
             if (data.predictions) {
-                const prediction = data.predictions.indexOf(
-                    Math.max(...data.predictions)
-                );
-                predictionResult.textContent = `Predicted Digit: ${prediction}`;
+                let predictions = [];
+                for (const val of data.predictions) {
+                    predictions.push(val[0]);
+                }
+
+                let maxVal = -Infinity;
+                let predictionIndex = -1;
+                for (let i = 0; i < predictions.length; i++) {
+                    if (predictions[i] > maxVal) {
+                        maxVal = predictions[i];
+                        predictionIndex = i;
+                    }
+                }
+                alert(`The number is ${predictionIndex}`);
             } else if (data.error) {
-                predictionResult.textContent = `Error: ${data.error}`;
+                console.log(data.error);
             }
         } catch (error) {
             console.error("Error submitting drawing:", error);
-            predictionResult.textContent = "Error submitting drawing.";
         }
     }
 
@@ -43,4 +52,18 @@ function initializeDrawGridButtons(clearButton, submitButton) {
     submitButton.addEventListener("click", submitDrawing);
 }
 
-export { initializeDrawGridButtons };
+async function trainModel() {
+    try {
+        const response = await fetch("/api/train", {
+            method: "POST",
+        });
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.statusText}`);
+        }
+        alert("Trained model sucessfully");
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export { initializeDrawGridButtons, trainModel };

@@ -201,7 +201,7 @@ input:focus {
 
 #neural-network-vis {
     width: 100%;
-    height: 5000px;
+    height: 3000px;
     border: 1px solid #ccc;
     background-color: #fff;
     position: relative;

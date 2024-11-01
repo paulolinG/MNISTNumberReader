@@ -8,7 +8,6 @@ function renderArchitecture(architecture) {
     };
 
     const layers = architecture.layers;
-    console.log(layers);
     const totalLayers = layers.length;
     const neuronSpacing = 20;
     const layerSpacing = 20;
@@ -120,6 +119,9 @@ function renderArchitecture(architecture) {
             padding: 10,
         },
     });
+
+    cyInstance.fit();
+    cyInstance.center();
 
     cyInstance.on("tap", "node", function (evt) {
         const node = evt.target;
